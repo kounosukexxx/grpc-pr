@@ -8,6 +8,7 @@ import (
 
 	"github.com/golang/protobuf/ptypes"
 	user "github.com/shota-aa/grpc-pr/pb/rest"
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
 
