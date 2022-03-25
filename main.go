@@ -7,20 +7,52 @@ import (
 	"time"
 
 	"github.com/golang/protobuf/ptypes"
+	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
+	grpc_zap "github.com/grpc-ecosystem/go-grpc-middleware/logging/zap"
+	grpc_ctxtags "github.com/grpc-ecosystem/go-grpc-middleware/tags"
 	user "github.com/shota-aa/grpc-pr/pb/rest"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/reflection"
 )
 
 func main() {
-	lis, err := net.Listen("tcp", ":8080")
+	lis, err := net.Listen("tcp", ":443")
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
-	s := grpc.NewServer()
+
+	// logging
+	zap, err := zap.NewProduction()
+	if err != nil {
+		log.Fatalf("failed to set: %v", err)
+	}
+	zap_opt := grpc_zap.WithLevels( // --- ②
+		func(c codes.Code) zapcore.Level {
+			var l zapcore.Level
+			switch c {
+			case codes.OK:
+				l = zapcore.InfoLevel
+
+			case codes.Internal:
+				l = zapcore.ErrorLevel
+
+			default:
+				l = zapcore.DebugLevel
+			}
+			return l
+		},
+	)
+
+	s := grpc.NewServer(grpc_middleware.WithUnaryServerChain(
+		grpc_ctxtags.UnaryServerInterceptor(),
+		grpc_zap.UnaryServerInterceptor(zap, zap_opt),
+	))
 	user.RegisterUserServiceServer(s, &server{})
 	reflection.Register(s)
-	log.Printf("Listening on %v", ":8080")
+	log.Printf("Listening on %v", ":443")
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}

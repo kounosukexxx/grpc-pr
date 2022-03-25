@@ -6,7 +6,7 @@ RUN mkdir /go/src/work
 WORKDIR /go/src/work
 # ホストのファイルをコンテナの作業ディレクトリに移行
 ADD . /go/src/work
-EXPOSE 8080
+EXPOSE 443
 
 COPY ./ ./go/src/work
 RUN go mod download
@@ -30,5 +30,5 @@ RUN apk --update add tzdata \
   && rm -rf /var/cache/apk/*
 
 COPY --from=server-build /go/src/work/main ./
-ENV PORT 8080
+ENV PORT 443
 CMD ["./main"]
