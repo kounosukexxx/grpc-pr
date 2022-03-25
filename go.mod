@@ -11,10 +11,12 @@ require (
 )
 
 require (
+	github.com/pkg/errors v0.9.1 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
 	golang.org/x/net v0.0.0-20211112202133-69e39bad7dc2 // indirect
-	golang.org/x/sys v0.0.0-20210917161153-d61c044b1678 // indirect
+	golang.org/x/sys v0.0.0-20220319134239-a9b59b0215f8 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	google.golang.org/genproto v0.0.0-20220323144105-ec3c684e5b14 // indirect
+	gopkg.in/yaml.v2 v2.3.0 // indirect
 )

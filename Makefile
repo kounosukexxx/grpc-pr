@@ -13,7 +13,18 @@ protobuf-doc:
 	mkdir -p docs/protobuf_schema
 	protoc --doc_out=html,rest.html:docs/protobuf_schema proto/rest/*.proto
 
-
 .PHONY: evans
 evans:
 	evans -r repl --port 8080
+
+	.PHONY: up-b
+up-b:
+	@docker-compose up --build
+
+.PHONY: up
+up:
+	@docker-compose up
+
+.PHONY: down
+down:
+	@docker-compose down -v

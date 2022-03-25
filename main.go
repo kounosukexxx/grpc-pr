@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"net"
+	"os"
 	"time"
 
 	"github.com/golang/protobuf/ptypes"
@@ -19,7 +20,11 @@ import (
 )
 
 func main() {
-	lis, err := net.Listen("tcp", ":443")
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+	lis, err := net.Listen("tcp", ":"+port)
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
@@ -52,7 +57,7 @@ func main() {
 	))
 	user.RegisterUserServiceServer(s, &server{})
 	reflection.Register(s)
-	log.Printf("Listening on %v", ":443")
+	log.Printf("Listening on %v", ":"+port)
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}

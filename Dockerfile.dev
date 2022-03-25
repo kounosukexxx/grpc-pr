@@ -1,0 +1,19 @@
+FROM golang:1.18-alpine
+
+RUN apk update && \
+    apk --no-cache add git
+
+# コンテナ内に作業ディレクトリを作成
+RUN mkdir /go/src/work
+
+# コンテナログイン時のディレクトリ指定
+WORKDIR /go/src/work
+# ホストのファイルをコンテナの作業ディレクトリに移行
+ADD . /go/src/work
+
+RUN go mod tidy
+
+RUN export PATH=$PATH:$(go env GOPATH)/bin
+
+RUN go get github.com/cosmtrek/air
+RUN go install github.com/cosmtrek/air

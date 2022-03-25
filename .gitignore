@@ -1,2 +1,4 @@
 *.pb.go
 *.html
+rest-test
+tmp

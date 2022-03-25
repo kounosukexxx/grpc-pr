@@ -1,0 +1,45 @@
+version: "3"
+services:
+  # db:
+  #   build: ./mysql
+  #   volumes:
+  #     - ./mysql/init:/docker-entrypoint-initdb.d 
+  #     # - ./mysql/data:/var/lib/mysql
+  #   container_name: hack_mysql
+  #   image: hack_mysql
+  #   # command: bash -c 'usermod -o -u $LINUX_MYSQL_UID mysql; groupmod -o -g $LINUX_MYSQL_GID mysql; chown -R mysql:root /var/run/mysqld/ /var/log/mysql/ /var/lib/mysql/; /entrypoint.sh mysqld --user=mysql --console'
+  #   environment:
+  #       MYSQL_ROOT_PASSWORD: password
+  #       MYSQL_DATABASE: 21hack18
+  #   expose:
+  #     - "3306"
+  #   ports:
+  #     - "3306:3306"
+
+  # phpmyadmin:
+  #   image: phpmyadmin/phpmyadmin
+  #   environment:
+  #     - PMA_ARBITRARY=1
+  #     - PMA_HOST=db
+  #     - PMA_USER=root
+  #     - PMA_PASSWORD=password
+  #   links:
+  #     - db
+  #   ports:
+  #     - 4040:80
+  #   volumes:
+  #     - ./phpmyadmin/sessions:/sessions
+  
+  app: # service名
+    build:
+      context: .
+      dockerfile: ./Dockerfile.dev # ビルドに使用するDockerfileがあるディレクトリ指定
+    tty: true # コンテナの起動永続化
+    command: "air -c .air.toml"
+    # env_file: .env
+    volumes:
+      - .:/go/src/work # マウントディレクトリ指定
+    depends_on: 
+      - db
+    ports: # ホストOSのポートとコンテナのポートをつなげる 
+      - "8080:8080"
