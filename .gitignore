@@ -3,5 +3,5 @@
 rest-test
 tmp
 *.log
-serviceAccount.json
+*.json
 .env

@@ -11,4 +11,4 @@ rest-test
 # firebase.*
 # firestore.*
 # remote.config.template.json
-serviceAccount.json
+*.json
