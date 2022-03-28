@@ -7,6 +7,7 @@ import (
 	"os"
 	"time"
 
+	firebase "firebase.google.com/go"
 	"github.com/golang/protobuf/ptypes"
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpc_zap "github.com/grpc-ecosystem/go-grpc-middleware/logging/zap"
@@ -14,6 +15,7 @@ import (
 	user "github.com/shota-aa/grpc-pr/pb"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"google.golang.org/api/option"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/reflection"
@@ -28,6 +30,60 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
+
+	ctx := context.Background()
+	projectID := "kauche-practice"
+	conf := &firebase.Config{ProjectID: projectID}
+	sa := option.WithCredentialsFile("credential/serviceAccount.json")
+	app, err := firebase.NewApp(ctx, conf, sa)
+	// app, err := firebase.NewApp(ctx, conf)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	client, err := app.Firestore(ctx)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer client.Close()
+	log.Println("aaaaaaaaaaaa")
+
+	// client, err := firestore.NewClient(ctx, "kauche-practice")
+	// if err != nil {
+	// 	log.Fatal("aaaa")
+	// 	log.Fatal(err)
+	// }
+
+	log.Print("aa")
+	doc, _, err := client.Collection("users").Add(ctx, map[string]interface{}{
+		"name": "hello1",
+	})
+	log.Print("ww")
+	if err != nil {
+		log.Fatal(err)
+	}
+	println(doc.ID)
+
+	// client, err := firestore.NewClient(ctx, "kauche-practice")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// 	return
+	// }
+	// defer client.Close()
+	// iter := client.Collection("spots").Documents(ctx)
+	// defer iter.Stop()
+
+	// for {
+	// 	doc, err := iter.Next()
+	// 	if err == iterator.Done {
+	// 		break
+	// 	}
+
+	// 	if err != nil {
+	// 		log.Fatalf("Failed to iterate: %v<br>", err)
+	// 	}
+
+	// 	fmt.Printf("%v\n", doc.Data())
+	// }
 
 	// logging
 	zap, err := zap.NewProduction()
