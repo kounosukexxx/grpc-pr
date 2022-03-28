@@ -36,10 +36,10 @@ services:
       dockerfile: dev/Dockerfile.dev # ビルドに使用するDockerfileがあるディレクトリ指定
     tty: true # コンテナの起動永続化
     command: "air -c .air.toml"
-    # env_file: .env
+    env_file: .env
     volumes:
       - ../:/go/src/work # マウントディレクトリ指定
-    depends_on: 
-      - db
+    # depends_on: 
+    #   - db
     ports: # ホストOSのポートとコンテナのポートをつなげる 
       - "8080:8080"

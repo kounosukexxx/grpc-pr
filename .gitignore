@@ -2,3 +2,6 @@
 *.html
 rest-test
 tmp
+*.log
+serviceAccount.json
+.env

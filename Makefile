@@ -12,3 +12,17 @@ protobuf-doc:
 	rm -rf docs/protobuf_schema
 	mkdir -p docs/protobuf_schema
 	protoc --doc_out=html,protobuf.html:docs/protobuf_schema proto/*.proto
+
+.PHONY: firebase
+firebase:
+	firebase emulators:start
+
+.PHONY: clear
+clear:
+	rm pubsub-debug.log
+	rm firestore-debug.log
+	rm ui-debug.log
+
+.PHONY: app
+app:
+	docker exec -it dev-app-1 /bin/sh

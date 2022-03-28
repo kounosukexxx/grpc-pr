@@ -6,3 +6,9 @@ README.md
 docs
 Makefile
 rest-test
+*.log
+# .firebaserc
+# firebase.*
+# firestore.*
+# remote.config.template.json
+serviceAccount.json
