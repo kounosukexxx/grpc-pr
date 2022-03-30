@@ -16,7 +16,7 @@ import (
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpc_zap "github.com/grpc-ecosystem/go-grpc-middleware/logging/zap"
 	grpc_ctxtags "github.com/grpc-ecosystem/go-grpc-middleware/tags"
-	user "github.com/shota-aa/grpc-pr/pb"
+	pb "github.com/shota-aa/grpc-pr/pb/proto"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"google.golang.org/grpc"
@@ -121,7 +121,7 @@ func main() {
 		fmt.Printf("Published a message; msg ID: %v\n", id)
 	}
 
-	pbuser := &user.User{
+	pbuser := &pb.GetUserResponse{
 		Id:        999,
 		Name:      "kounosuke",
 		Email:     "dqx@com",
@@ -167,7 +167,7 @@ func main() {
 	if err != nil {
 		fmt.Printf("result.Get: %v", err)
 	}
-	a := user.User{}
+	a := pb.GetUserResponse{}
 	err = proto.Unmarshal(msg2, &a)
 	fmt.Printf("msg2: %v\n", a)
 
@@ -192,6 +192,7 @@ func main() {
 	if err != nil {
 		fmt.Print(err)
 	}
+
 	// logging
 	zap, err := zap.NewProduction()
 	if err != nil {
@@ -218,7 +219,7 @@ func main() {
 		grpc_ctxtags.UnaryServerInterceptor(),
 		grpc_zap.UnaryServerInterceptor(zap, zap_opt),
 	))
-	user.RegisterUserServiceServer(s, &server{})
+	pb.RegisterUserServiceServer(s, &server{})
 	reflection.Register(s)
 	log.Printf("Listening on %v", ":"+port)
 	if err := s.Serve(lis); err != nil {
@@ -228,8 +229,12 @@ func main() {
 
 type server struct{}
 
-func (s *server) GetUser(ctx context.Context, req *user.GetUserRequest) (*user.User, error) {
+func (s *server) GetUser(ctx context.Context, req *pb.GetUserRequest) (*pb.GetUserResponse, error) {
 	log.Printf("Received: %v", req.Id)
 	now, _ := ptypes.TimestampProto(time.Now())
-	return &user.User{Id: req.Id, Name: "John Smith", Email: "johnsmith@example.com", UpdatedAt: now}, nil
+	return &pb.GetUserResponse{Id: req.Id, Name: "John Smith", Email: "johnsmith@example.com", UpdatedAt: now}, nil
+}
+
+func (s *server) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb.CreateUserResponse, error) {
+	return nil, nil
 }

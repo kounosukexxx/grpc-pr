@@ -5,7 +5,7 @@ protobuf: protobuf-go protobuf-doc
 protobuf-go:
 	rm -rf pb
 	mkdir -p pb
-	protoc --proto_path=proto/. --go-grpc_opt require_unimplemented_servers=false,paths=source_relative --go-grpc_out pb/ --go_opt paths=source_relative --go_out pb/ proto/*.proto
+	protoc -I . --go-grpc_opt require_unimplemented_servers=false,paths=source_relative --go-grpc_out pb/ --go_opt paths=source_relative --go_out pb/ proto/*.proto
 
 .PHONY: protobuf-doc
 protobuf-doc:
@@ -26,3 +26,7 @@ clear:
 .PHONY: app
 app:
 	docker exec -it dev-app-1 /bin/sh
+
+.PHONY: lint
+lint:
+	prototool lint
