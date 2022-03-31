@@ -20,6 +20,7 @@ require (
 	firebase.google.com/go v3.13.0+incompatible // indirect
 	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect
 	github.com/google/go-cmp v0.5.7 // indirect
+	github.com/google/uuid v1.3.0 // indirect
 	github.com/googleapis/gax-go v1.0.3 // indirect
 	github.com/googleapis/gax-go/v2 v2.1.1 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
