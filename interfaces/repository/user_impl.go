@@ -3,7 +3,6 @@ package repository
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"cloud.google.com/go/firestore"
 	"github.com/google/uuid"
@@ -42,15 +41,14 @@ func (repo *UserRepository) GetUser(ctx context.Context, userId uuid.UUID) (*dom
 
 func (repo *UserRepository) CreateUser(ctx context.Context, arg *repository.CreateUserArg) (*domain.User, error) {
 	ID := uuid.New()
-	now := time.Now()
 	_, err := repo.client.Collection("users").
 		Doc(ID.String()).
 		Set(ctx, map[string]interface{}{
 			"id":         ID.String(),
 			"name":       arg.Name,
 			"email":      arg.Email,
-			"created_at": now,
-			"updated_at": now,
+			"created_at": firestore.ServerTimestamp,
+			"updated_at": firestore.ServerTimestamp,
 		})
 	if err != nil {
 		return nil, err

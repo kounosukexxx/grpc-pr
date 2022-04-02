@@ -19,12 +19,19 @@ var userSet = wire.NewSet(
 	handler.NewUserHandler,
 )
 
+var roomSet = wire.NewSet(
+	impl.NewRoomRepository,
+	service.NewRoomService,
+	handler.NewRoomHandler,
+)
+
 var grpcSet = wire.NewSet(handler.NewGRPC)
 
 func InjectGRPCServer(c *config.Config) (handler.GRPC, error) {
 	wire.Build(
 		firestoreSet,
 		userSet,
+		roomSet,
 		grpcSet,
 	)
 	return handler.GRPC{}, nil

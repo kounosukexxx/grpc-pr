@@ -24,7 +24,10 @@ func InjectGRPCServer(c *config.Config) (handler.GRPC, error) {
 	userRepository := repository.NewUserRepository(client)
 	userService := service.NewUserService(userRepository)
 	userHandler := handler.NewUserHandler(userService)
-	grpc := handler.NewGRPC(userHandler)
+	roomRepository := repository.NewRoomRepository(client)
+	roomService := service.NewRoomService(roomRepository)
+	roomHandler := handler.NewRoomHandler(roomService)
+	grpc := handler.NewGRPC(userHandler, roomHandler)
 	return grpc, nil
 }
 
@@ -33,5 +36,7 @@ func InjectGRPCServer(c *config.Config) (handler.GRPC, error) {
 var firestoreSet = wire.NewSet(NewFirestoreClient)
 
 var userSet = wire.NewSet(repository.NewUserRepository, service.NewUserService, handler.NewUserHandler)
+
+var roomSet = wire.NewSet(repository.NewRoomRepository, service.NewRoomService, handler.NewRoomHandler)
 
 var grpcSet = wire.NewSet(handler.NewGRPC)

@@ -8,12 +8,31 @@ import "proto/user.proto";
 import "google/protobuf/timestamp.proto";
 
 service RoomService {
+  rpc GetRoom(GetRoomRequest) returns (GetRoomResponse) {}
+  rpc GetRooms(GetRoomsRequest) returns (GetRoomsResponse) {}
   rpc CreateRoom(CreateRoomRequest) returns (CreateRoomResponse) {}
+  rpc CreateComment(CreateCommentRequest) returns (CreateCommentResponse) {}
+};
+
+message GetRoomRequest {
+  string id = 1;
+};
+
+message GetRoomResponse {
+  string id = 1;
+  string name = 2;
+  repeated Comment comments = 3;
+};
+
+message GetRoomsRequest {};
+
+message GetRoomsResponse {
+  repeated Room rooms = 1;
 };
 
 message CreateRoomRequest {
   string name = 1;
-  repeated user.User users = 2;
+  repeated string users = 2;
 };
 
 message CreateRoomResponse {
@@ -23,4 +42,26 @@ message CreateRoomResponse {
 
   google.protobuf.Timestamp created_at = 13;
   google.protobuf.Timestamp updated_at = 14;
+};
+
+message CreateCommentRequest {
+  string roomId = 1;
+  string comment = 2;
+};
+
+message CreateCommentResponse {
+  string id = 1;
+  string comment = 2;
+  user.User user = 3;
+};
+
+message Room {
+  string id = 1;
+  string name = 2;
+};
+
+message Comment {
+  string id = 1;
+  string comment = 2;
+  user.User user = 3;
 };
