@@ -1,8 +1,15 @@
 package domain
 
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
+
 type User struct {
-	Id    int
+	Id    uuid.UUID
 	Name  string
 	Email string
-	Model
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }

@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 
+	"github.com/google/uuid"
 	"github.com/shota-aa/grpc-pr/domain"
 )
 
@@ -13,6 +14,6 @@ type CreateUserArg struct {
 
 type UserRepository interface {
 	// GetUsers(ctx context.Context) ([]*domain.User, error)
-	GetUser(ctx context.Context, userId int) (*domain.User, error)
+	GetUser(ctx context.Context, userId uuid.UUID) (*domain.User, error)
 	CreateUser(ctx context.Context, arg *CreateUserArg) (*domain.User, error)
 }
