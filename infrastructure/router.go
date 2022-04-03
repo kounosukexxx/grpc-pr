@@ -42,6 +42,7 @@ func SetupGRPCServer(h handler.GRPC) *grpc.Server {
 		grpc_zap.UnaryServerInterceptor(zap, zap_opt),
 	))
 	pb.RegisterUserServiceServer(s, h.User)
+	pb.RegisterRoomServiceServer(s, h.Room)
 	reflection.Register(s)
 	
 	return s

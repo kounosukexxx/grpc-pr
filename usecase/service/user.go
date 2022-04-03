@@ -15,7 +15,7 @@ type UserService interface {
 }
 
 type userService struct {
-	repo repository.UserRepository
+	user repository.UserRepository
 }
 
 func NewUserService(user repository.UserRepository) UserService {
@@ -30,7 +30,7 @@ func NewUserService(user repository.UserRepository) UserService {
 // }
 
 func (s *userService) GetUser(ctx context.Context, userId uuid.UUID) (*domain.User, error) {
-	user, err := s.repo.GetUser(ctx, userId)
+	user, err := s.user.GetUser(ctx, userId)
 	if err != nil {
 		return nil, err
 	}
@@ -38,7 +38,7 @@ func (s *userService) GetUser(ctx context.Context, userId uuid.UUID) (*domain.Us
 }
 
 func (s *userService) CreateUser(ctx context.Context, arg *repository.CreateUserArg) (*domain.User, error) {
-	user, err := s.repo.CreateUser(ctx, arg)
+	user, err := s.user.CreateUser(ctx, arg)
 	if err != nil {
 		return nil, err
 	}

@@ -13,15 +13,25 @@ type RoomService interface {
 }
 
 type roomService struct {
-	repo repository.RoomRepository
+	room repository.RoomRepository
+	user repository.UserRepository
 }
 
-func NewRoomService(room repository.RoomRepository) RoomService {
-	return &roomService{room}
+func NewRoomService(room repository.RoomRepository, user repository.UserRepository) RoomService {
+	return &roomService{room, user}
 }
 
 func (s *roomService) CreateRoom(ctx context.Context, arg *repository.CreateRoomArg) (*domain.Room, error) {
-	return nil, nil
+	users, err := s.user.GetUsersByIDs(ctx, arg.UserIds)
+	if err != nil {
+		return nil, err
+	}
+	room, err := s.room.CreateRoom(ctx, arg)
+	if err != nil {
+		return nil, err
+	}
+	room.Users = users
+	return room, nil
 }
 
 func (s *roomService) CreateComment(ctx context.Context, arg *repository.CreateCommentArg) (*domain.Comment, error) {

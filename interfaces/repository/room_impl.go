@@ -4,7 +4,9 @@ import (
 	"context"
 
 	firestore "cloud.google.com/go/firestore"
+	"github.com/google/uuid"
 	"github.com/shota-aa/grpc-pr/domain"
+	"github.com/shota-aa/grpc-pr/interfaces/repository/model"
 	"github.com/shota-aa/grpc-pr/usecase/repository"
 )
 
@@ -17,7 +19,44 @@ func NewRoomRepository(client *firestore.Client) repository.RoomRepository {
 }
 
 func (repo *RoomRepository) CreateRoom(ctx context.Context, arg *repository.CreateRoomArg) (*domain.Room, error) {
-	return nil, nil
+	ID := uuid.New()
+	_, err := repo.client.Collection("rooms").
+		Doc(ID.String()).
+		Set(ctx, map[string]interface{}{
+			"id":         ID.String(),
+			"name":       arg.Name,
+			"created_at": firestore.ServerTimestamp,
+			"updated_at": firestore.ServerTimestamp,
+		})
+	for _, userId := range arg.UserIds {
+		_, err := repo.client.Collection("rooms").
+		Doc(ID.String()).
+		Collection("users").
+		Doc(userId.String()).
+		Set(ctx, map[string]interface{}{
+			"id": userId.String(),
+		})
+		if err != nil {
+			return nil, err
+		}
+	}
+	// 取らなくてもいけるが
+	doc, err := repo.client.Collection("rooms").
+		Doc(ID.String()).
+		Get(ctx)
+	if err != nil {
+		return nil, err
+	}
+	var room model.Room
+	if err = doc.DataTo(&room); err != nil {
+		return nil, err
+	}
+	return &domain.Room{
+		Id:        ID,
+		Name:      room.Name,
+		CreatedAt: room.CreatedAt,
+		UpdatedAt: room.UpdatedAt,
+	}, nil
 }
 
 func (repo *RoomRepository) CreateComment(ctx context.Context, arg *repository.CreateCommentArg) (*domain.Comment, error) {

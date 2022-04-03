@@ -25,7 +25,7 @@ func InjectGRPCServer(c *config.Config) (handler.GRPC, error) {
 	userService := service.NewUserService(userRepository)
 	userHandler := handler.NewUserHandler(userService)
 	roomRepository := repository.NewRoomRepository(client)
-	roomService := service.NewRoomService(roomRepository)
+	roomService := service.NewRoomService(roomRepository, userRepository)
 	roomHandler := handler.NewRoomHandler(roomService)
 	grpc := handler.NewGRPC(userHandler, roomHandler)
 	return grpc, nil

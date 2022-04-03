@@ -1,6 +1,8 @@
 package model
 
-import "time"
+import (
+	"time"
+)
 
 type Room struct {
 	Id        string     `firestore:"id"`

@@ -2,9 +2,15 @@ package handler
 
 import (
 	"context"
+	"log"
 
+	"github.com/golang/protobuf/ptypes"
+	"github.com/google/uuid"
 	pb "github.com/shota-aa/grpc-pr/pb/proto"
+	"github.com/shota-aa/grpc-pr/usecase/repository"
 	"github.com/shota-aa/grpc-pr/usecase/service"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type RoomHandler struct {
@@ -24,9 +30,45 @@ func (h *RoomHandler) GetRooms(ctx context.Context, req *pb.GetRoomsRequest) (*p
 }
 
 func (h *RoomHandler) CreateRoom(ctx context.Context, req *pb.CreateRoomRequest) (*pb.CreateRoomResponse, error) {
-	return nil, nil
+	var userIds []*uuid.UUID
+	for _, user := range req.Users {
+		userId, err := uuid.Parse(user)
+		if err != nil {
+			return nil, status.Error(codes.InvalidArgument, "bad request")
+		}
+		userIds = append(userIds, &userId)
+	}
+	room, err := h.repo.CreateRoom(ctx, &repository.CreateRoomArg{
+		Name:    req.Name,
+		UserIds: userIds,
+	})
+	if err != nil {
+		log.Println(err.Error())
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+	createdAt, _ := ptypes.TimestampProto(room.CreatedAt)
+	updatedAt, _ := ptypes.TimestampProto(room.UpdatedAt)
+	var resUsers []*pb.User
+	for _, u := range room.Users {
+		createdAt, _ := ptypes.TimestampProto(u.CreatedAt)
+		updatedAt, _ := ptypes.TimestampProto(u.UpdatedAt)
+		resUsers = append(resUsers, &pb.User{
+			Id:    u.Id.String(),
+			Name:  u.Name,
+			Email: u.Email,
+			CreatedAt: createdAt,
+			UpdatedAt: updatedAt,
+		})
+	}
+	return &pb.CreateRoomResponse{
+		Id:        room.Id.String(),
+		Name:      room.Name,
+		Users:     resUsers,
+		CreatedAt: createdAt,
+		UpdatedAt: updatedAt,
+	}, nil
 }
 
-func (g *RoomHandler) CreateComment(ctx context.Context, req *pb.CreateCommentRequest) (*pb.CreateCommentResponse, error) {
+func (h *RoomHandler) CreateComment(ctx context.Context, req *pb.CreateCommentRequest) (*pb.CreateCommentResponse, error) {
 	return nil, nil
 }

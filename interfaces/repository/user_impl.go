@@ -9,6 +9,7 @@ import (
 	"github.com/shota-aa/grpc-pr/domain"
 	"github.com/shota-aa/grpc-pr/interfaces/repository/model"
 	"github.com/shota-aa/grpc-pr/usecase/repository"
+	"google.golang.org/api/iterator"
 )
 
 type UserRepository struct {
@@ -53,14 +54,15 @@ func (repo *UserRepository) CreateUser(ctx context.Context, arg *repository.Crea
 	if err != nil {
 		return nil, err
 	}
-	data, err := repo.client.Collection("users").
+	// 取らなくてもいけるが
+	doc, err := repo.client.Collection("users").
 		Doc(ID.String()).
 		Get(ctx)
 	if err != nil {
 		return nil, err
 	}
 	var user model.User
-	if err = data.DataTo(&user); err != nil {
+	if err = doc.DataTo(&user); err != nil {
 		return nil, err
 	}
 	return &domain.User{
@@ -70,6 +72,43 @@ func (repo *UserRepository) CreateUser(ctx context.Context, arg *repository.Crea
 		CreatedAt: user.CreatedAt,
 		UpdatedAt: user.UpdatedAt,
 	}, nil
+}
+
+func (repo *UserRepository) GetUsersByIDs(ctx context.Context, userIds []*uuid.UUID) ([]*domain.User, error) {
+	var strUserIds []string
+	for _, userId := range userIds {
+		strUserIds = append(strUserIds, userId.String())
+	}
+	iter := repo.client.Collection("users").
+		Where("id", "in", strUserIds).
+		Documents(ctx)
+	var users []*domain.User
+	// map使って安全にできそう
+	for {
+		doc, err := iter.Next()
+		if err == iterator.Done {
+			break
+		}
+		if err != nil {
+			return nil, err
+		}
+		var u model.User
+		if err = doc.DataTo(&u); err != nil {
+			return nil, err
+		}
+		userId, err := uuid.Parse(u.Id)
+		if err != nil {
+			return nil, err
+		}
+		users = append(users, &domain.User{
+			Id:        userId,
+			Name:      u.Name,
+			Email:     u.Email,
+			CreatedAt: u.CreatedAt,
+			UpdatedAt: u.UpdatedAt,
+		})
+	}
+	return users, nil
 }
 
 // func mapToUser(userMap map[string]interface{}, val interface{}) error {
