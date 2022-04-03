@@ -20,26 +20,32 @@ func NewRoomRepository(client *firestore.Client) repository.RoomRepository {
 
 func (repo *RoomRepository) CreateRoom(ctx context.Context, arg *repository.CreateRoomArg) (*domain.Room, error) {
 	ID := uuid.New()
-	_, err := repo.client.Collection("rooms").
-		Doc(ID.String()).
-		Set(ctx, map[string]interface{}{
+	err := repo.client.RunTransaction(ctx, func(ctx context.Context, t *firestore.Transaction) error {
+		roomRef := repo.client.Collection("rooms").Doc(ID.String())
+		err := t.Set(roomRef, map[string]interface{}{
 			"id":         ID.String(),
 			"name":       arg.Name,
 			"created_at": firestore.ServerTimestamp,
 			"updated_at": firestore.ServerTimestamp,
 		})
-	for _, userId := range arg.UserIds {
-		_, err := repo.client.Collection("rooms").
-		Doc(ID.String()).
-		Collection("users").
-		Doc(userId.String()).
-		Set(ctx, map[string]interface{}{
-			"id": userId.String(),
-		})
 		if err != nil {
-			return nil, err
+			return err
 		}
-	}
+		for _, userId := range arg.UserIds {
+			userRef := repo.client.Collection("rooms").
+				Doc(ID.String()).
+				Collection("users").
+				Doc(userId.String())
+			err = t.Set(userRef, map[string]interface{}{
+				"id": userId,
+			})
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+
 	// 取らなくてもいけるが
 	doc, err := repo.client.Collection("rooms").
 		Doc(ID.String()).

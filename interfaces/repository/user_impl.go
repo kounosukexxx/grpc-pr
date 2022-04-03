@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"cloud.google.com/go/firestore"
@@ -107,6 +108,10 @@ func (repo *UserRepository) GetUsersByIDs(ctx context.Context, userIds []*uuid.U
 			CreatedAt: u.CreatedAt,
 			UpdatedAt: u.UpdatedAt,
 		})
+	}
+	// 雑なエラー
+	if len(users) != len(userIds) {
+		return nil, errors.New("user not found")
 	}
 	return users, nil
 }
