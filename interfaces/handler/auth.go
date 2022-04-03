@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"errors"
 	"net/http"
 
 	"github.com/shota-aa/grpc-pr/util/random"
@@ -9,7 +10,7 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
-func setCookie(ctx context.Context) error {
+func setCookieToCtx(ctx context.Context) error {
 	value, err := random.MakeRandomStr(30)
 	if err != nil {
 		return err
@@ -32,6 +33,24 @@ func setCookie(ctx context.Context) error {
 	return nil
 }
 
-func getSessionID(ctx context.Context) (string, error) {
-	
+func getSessionIDFromCtx(ctx context.Context) (string, error) {
+	md, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		return "", errors.New("cannot get metadata")
+	}
+	vs, ok := md["cookie"]
+	if !ok {
+		return "", errors.New("no cookie")
+	}
+	rawCookie := vs[0]
+	if len(rawCookie) != 0 {
+		return "", errors.New("no cookie content")
+	}
+
+	parser := &http.Request{Header: http.Header{"cookie": []string{rawCookie}}}
+	cookie, err := parser.Cookie("session")
+	if err != nil {
+		return "", nil
+	}
+	return cookie.Value, nil
 } 
