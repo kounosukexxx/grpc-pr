@@ -5,7 +5,7 @@ import (
 	"errors"
 )
 
-func MakeRandomStr(digit uint32) (string, error) {
+func MakeRandomStr(digit int) (string, error) {
 	const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
 	// 乱数を生成

@@ -17,6 +17,7 @@ type Room struct {
 
 type Comment struct {
 	Id        uuid.UUID
+	RoomId    uuid.UUID
 	Comment   string
 	User      *User
 	CreatedAt time.Time

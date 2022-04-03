@@ -51,8 +51,9 @@ message CreateCommentRequest {
 
 message CreateCommentResponse {
   string id = 1;
-  string comment = 2;
-  user.User user = 3;
+  string roomId = 2;
+  string comment = 3;
+  user.User created_by = 4;
 };
 
 message Room {
